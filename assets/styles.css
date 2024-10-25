@@ -1,0 +1,12 @@
+body {
+    background-color: #f8f9fa;
+}
+h1, h2 {
+    color: #333;
+}
+.card {
+    border: 1px solid #ddd;
+}
+.custom-file-label::after {
+    content: "Browse";
+}

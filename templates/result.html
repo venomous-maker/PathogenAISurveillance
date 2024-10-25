@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}">
+</head>
+<body>
+<div class="container text-center my-5">
+    <h2>Prediction Result</h2>
+    <div class="card mx-auto mt-4" style="width: 18rem;">
+        <img src="{{ url_for('uploaded_file', filename=image_path.split('/')[-1]) }}" class="card-img-top" alt="Uploaded Image">
+        <div class="card-body">
+            <h5 class="card-title">Predicted Class: {{ predicted_class }}</h5>
+            <h5 class="card-title">Confidence: {{ prediction_confidence }}</h5>
+            <a href="{{ url_for('home') }}" class="btn btn-success mt-3">Upload Another Image</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
