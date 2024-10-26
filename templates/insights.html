@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathogen Analysis Form</title>
+    <style>
+        /* Basic reset and styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        /* Card and form styling */
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .card-header {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #0d6efd;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0d6efd;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0b5ed7;
+        }
+
+        /* Insights card styling */
+        .insights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .insight-card {
+            background-color: #f9fafc;
+            border: 1px solid #e0e4e7;
+            border-radius: 8px;
+            padding: 15px;
+            width: calc(33% - 10px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-header {
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Form Card -->
+    <div class="card">
+        <div class="card-header">Pathogen Analysis Form</div>
+        <form id="analysisForm" enctype="multipart/form-data">
+            <label for="patientName">Patient Name:</label>
+            <input type="text" id="patientName" name="patientName" placeholder="Enter patient's name" required>
+
+            <label for="pathogenType">Pathogen Type:</label>
+            <select id="pathogenType" name="pathogenType" required>
+                <option value="" disabled selected>Select pathogen type</option>
+                <option value="virus">Virus</option>
+                <option value="bacteria">Bacteria</option>
+                <option value="fungus">Fungus</option>
+                <option value="parasite">Parasite</option>
+            </select>
+
+            <label for="sampleImage">Upload Sample Image:</label>
+            <input type="file" id="sampleImage" name="sampleImage" accept="image/*" required>
+
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="Any additional details..."></textarea>
+
+            <button type="submit">Submit Analysis</button>
+        </form>
+    </div>
+
+    <!-- Insights Display Card -->
+    <div class="card">
+        <div class="card-header">Analysis Insights</div>
+        <div id="insightsContainer" class="insights">
+            <!-- Insights cards will be dynamically generated here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle form submission
+    document.getElementById('analysisForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('patientName', document.getElementById('patientName').value);
+        formData.append('pathogenType', document.getElementById('pathogenType').value);
+        formData.append('file', document.getElementById('sampleImage').files[0]);
+        formData.append('notes', document.getElementById('notes').value);
+
+        try {
+            // Simulate server request
+            const response = await fetch("{{ url_for('predict') }}", {
+                method: 'POST',
+                body: formData
+            });
+
+            // Parse the response assuming it's JSON formatted
+            const data = await response.json();
+
+            // Clear previous insights
+            const insightsContainer = document.getElementById('insightsContainer');
+            insightsContainer.innerHTML = '';
+
+            // Display insights in cards
+            data.insights.forEach((insight, index) => {
+                const insightCard = document.createElement('div');
+                insightCard.classList.add('insight-card');
+                insightCard.innerHTML = `
+                    <div class="insight-header">Insight ${index + 1}</div>
+                    <div>${insight.description}</div>
+                    <h2>Prediction Result</h2>
+                    <div class="card mx-auto mt-4" style="width: 18rem;">
+                        <img src="${insight.image_path}" class="card-img-top" alt="Uploaded Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Predicted Class: ${ insight.predicted_class }</h5>
+                            <h5 class="card-title">Confidence: ${ insight.prediction_confidence }</h5>
+                        </div>
+                    </div>
+                `;
+                insightsContainer.appendChild(insightCard);
+            });
+        } catch (error) {
+            console.error('Error during submission:', error);
+            alert('An error occurred while submitting the analysis. Please try again later.');
+        }
+    });
+</script>
+
+</body>
+</html>
