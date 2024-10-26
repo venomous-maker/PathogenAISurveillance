@@ -419,11 +419,32 @@ class MemoryNetWork:
         print(f"Test Accuracy: {self.accuracy:.2f}")
 
     def predict_disease(self, signs_and_symptoms):
+        # Ensure signs_and_symptoms is a string
+        if isinstance(signs_and_symptoms, list):
+            signs_and_symptoms = ' '.join(signs_and_symptoms)
+
+        # Convert the symptoms into sequences
         sequence = self.tokenizer.texts_to_sequences([signs_and_symptoms])
         padded = pad_sequences(sequence, maxlen=self.max_length, padding='post')
+
+        # Get the prediction probabilities
         prediction = self.model.predict(padded)
-        predicted_class = np.argmax(prediction, axis=-1)
-        return self.label_encoder.inverse_transform(predicted_class)
+
+        # Get the top 5 predicted classes and their probabilities
+        top_n = 5
+        predicted_probabilities = prediction[0]  # Assuming the prediction shape is (1, num_classes)
+
+        # Get the indices of the top 5 probabilities
+        top_indices = np.argsort(predicted_probabilities)[-top_n:][::-1]  # Sort and get top 5 indices
+
+        # Prepare the results with disease names and their corresponding probabilities
+        results = []
+        for index in top_indices:
+            disease_name = self.label_encoder.inverse_transform([index])[0]
+            confidence = predicted_probabilities[index]
+            results.append((disease_name, confidence))
+
+        return results
 
     def save_model(self, model_path="saved_nlp_model.h5"):
         """Saves the trained model to the specified path."""
@@ -436,8 +457,8 @@ class MemoryNetWork:
 
 # Instantiate the MemoryNetWork
 network = MemoryNetWork()
-
-if not network.hasmodel():
+force = True
+if not network.hasmodel() or force:
     # Build and compile the model
     network.build_model()
     network.compile_model()
@@ -451,6 +472,10 @@ if not network.hasmodel():
     network.save_model()
 
 # Example prediction
-test_input = "Yellow-orange spots on leaves Leaf defoliation"  # Example signs and symptoms input
-predicted_disease = network.predict_disease(test_input)
-print(f"Predicted Disease: {predicted_disease[0]}")
+test_input = ['Leaf yellowing', 'Deformed fruit with scabs']  # Example signs and symptoms input
+# Get predictions
+predicted_diseases = network.predict_disease(test_input)
+
+# Print results
+for disease, confidence in predicted_diseases:
+    print(f"Disease: {disease}, Confidence: {confidence:.2f}")
