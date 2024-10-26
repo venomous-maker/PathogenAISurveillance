@@ -15,6 +15,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_arra
 
 class PlantVillageModel:
     def __init__(self, dataset_path, image_size=(224, 224), batch_size=32):
+        self.loaded_from_file = None
         self.dataset_path = dataset_path
         self.image_size = image_size
         self.batch_size = batch_size
