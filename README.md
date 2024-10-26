@@ -106,13 +106,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contact
 
 For any inquiries, please contact morganokumu8@gmail.com.
-
-
-### Instructions for Personalization
-
-1. **Repository URL**: Replace `<repository_url>` with the actual URL of your project repository.
-2. **Contact Information**: Update the email address with your own for user inquiries.
-3. **Dependencies**: Confirm that the dependencies listed in `requirements.txt` are accurate.
-4. **Project Structure**: Adjust any paths if your project structure changes or if additional files are added.
-
-Feel free to further customize the content based on your project specifics or preferences! Let me know if you need any changes or additional sections.
