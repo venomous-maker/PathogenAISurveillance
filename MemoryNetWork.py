@@ -324,7 +324,23 @@ class MemoryNetWork:
 
     def get_signs(self, item):
         if item in self.signsAndSymptomsDict:
-            return self.signsAndSymptomsDict[item]
+            return self.signsAndSymptomsDict[item]['signs']
+        return []
+
+    def get_symptoms(self, item):
+        if item in self.signsAndSymptomsDict:
+            return self.signsAndSymptomsDict[item]['symptoms']
+        return []
+
+    def get_cure(self, item):
+        if item in self.preventionsAndCure:
+            return self.preventionsAndCure[item]['cure']
+        return []
+
+    def get_preventions(self, item):
+        if item in self.preventionsAndCure:
+            return self.preventionsAndCure[item]['preventions']
+        return []
 
     def rename_keys_with_names(self):
         # Renaming keys in signsAndSymptomsDict
@@ -457,7 +473,7 @@ class MemoryNetWork:
 
 # Instantiate the MemoryNetWork
 network = MemoryNetWork()
-force = True
+force = False
 if not network.hasmodel() or force:
     # Build and compile the model
     network.build_model()
@@ -471,11 +487,11 @@ if not network.hasmodel() or force:
 
     network.save_model()
 
-# Example prediction
-test_input = ['Leaf yellowing', 'Deformed fruit with scabs']  # Example signs and symptoms input
-# Get predictions
-predicted_diseases = network.predict_disease(test_input)
-
-# Print results
-for disease, confidence in predicted_diseases:
-    print(f"Disease: {disease}, Confidence: {confidence:.2f}")
+# # Example prediction
+# test_input = ['Leaf yellowing', 'Deformed fruit with scabs']  # Example signs and symptoms input
+# # Get predictions
+# predicted_diseases = network.predict_disease(test_input)
+#
+# # Print results
+# for disease, confidence in predicted_diseases:
+#     print(f"Disease: {disease}, Confidence: {confidence:.2f}")
