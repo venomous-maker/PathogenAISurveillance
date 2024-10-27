@@ -7,7 +7,8 @@ This project is a comprehensive plant disease diagnosis system designed to ident
 ## Features
 
 - **Flask Web Application**: A RESTful API for users to submit symptoms and receive disease predictions.
-- **Memory Network Model**: A custom NLP model that utilizes LSTM layers to process and classify plant disease data.
+- **Memory Network Model**: A custom NLP model that utilizes LSTM layers to process and classify any trained data data.
+- **Plant Village Model**: A custome cNN model that utilizes LSTM layers to process and classify images using the trained data.
 - **PlantVillage Dataset**: The model is trained on a dataset containing various plant diseases along with their associated signs and symptoms.
 
 ## Project Structure
@@ -20,8 +21,8 @@ This project is a comprehensive plant disease diagnosis system designed to ident
 1. Clone the repository:
 
    ```bash
-   git clone <repository_url>
-   cd Plant-Disease-Diagnosis
+   git clone https://github.com/venomous-maker/PathogenAISurveillance
+   cd PathogenAISurveillance
    ```
 2. Install the required packages:
     ```bash
