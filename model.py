@@ -1,4 +1,7 @@
+import difflib
 import os
+import random
+
 import cv2
 import pandas as pd
 import numpy as np
@@ -165,6 +168,42 @@ class PlantVillageModel:
         else:
             raise ValueError("Image path does not exist")
 
+    def get_random_image_path(self, class_name):
+        class_name = class_name.replace(" ", "_")
+        subfolder_path = os.path.join(self.dataset_path, class_name)
+
+        # Check if the exact class folder exists
+        if not os.path.exists(subfolder_path):
+            # If not, find the closest match
+            closest_match = self.find_closest_class_name(class_name)
+            if closest_match:
+                subfolder_path = os.path.join(self.dataset_path, closest_match)
+                print(f"Using closest match: '{closest_match}' instead of '{class_name}'.")
+            else:
+                raise ValueError(f"Class folder '{class_name}' does not exist in the dataset path.")
+
+        if not os.path.exists(subfolder_path):
+            raise ValueError(f"Class folder '{class_name}' does not exist in the dataset path.")
+
+        # Get a list of all files in the class subfolder
+        image_filenames = os.listdir(subfolder_path)
+        if not image_filenames:
+            raise ValueError(f"No images found in class folder '{class_name}'.")
+
+        # Select a random image filename and return its full path
+        random_image_filename = random.choice(image_filenames)
+        return os.path.join(subfolder_path, random_image_filename)
+
+    def find_closest_class_name(self, class_name):
+        # Get all directories in the dataset path
+        existing_class_names = os.listdir(self.dataset_path)
+
+        # Use difflib to find the closest match
+        closest_matches = difflib.get_close_matches(class_name, existing_class_names, n=1)
+
+        if closest_matches:
+            return closest_matches[0]  # Return the closest match
+        return None  # Return None if no close matches found
 
 # Instantiate the class
 model = PlantVillageModel(dataset_path="./plantvillage dataset/color")
