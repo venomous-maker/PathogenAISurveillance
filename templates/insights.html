@@ -180,6 +180,8 @@
             <option value="fungus">Fungus</option>
             <option value="parasite">Parasite</option>
           </select>
+          <!-- Selected Symptoms Preview -->
+          <div id="selectedSymptoms" class="mt-3"></div>
 
           <label for="symptoms">Symptoms:</label>
           <div class="input-group" id="symptoms">
@@ -189,6 +191,7 @@
               id="dropdownMenuButton"
               data-bs-toggle="dropdown"
               aria-expanded="false"
+               data-bs-auto-close="outside"
             >
               Select Symptoms
             </button>
@@ -196,11 +199,12 @@
               <li>
                 <div class="form-check">
                   <input
-                    class="form-check-input"
+                    class="form-check-input symptom-checkbox"
                     type="checkbox"
                     value="leaf_spot"
                     id="symptom1"
-                  /><label class="form-check-label" for="symptom1"
+                  />
+                  <label class="form-check-label" for="symptom1"
                     >Leaf Spot</label
                   >
                 </div>
@@ -208,23 +212,23 @@
               <li>
                 <div class="form-check">
                   <input
-                    class="form-check-input"
+                    class="form-check-input symptom-checkbox"
                     type="checkbox"
                     value="wilting"
                     id="symptom2"
-                  /><label class="form-check-label" for="symptom2"
-                    >Wilting</label
-                  >
+                  />
+                  <label class="form-check-label" for="symptom2">Wilting</label>
                 </div>
               </li>
               <li>
                 <div class="form-check">
                   <input
-                    class="form-check-input"
+                    class="form-check-input symptom-checkbox"
                     type="checkbox"
                     value="yellowing"
                     id="symptom3"
-                  /><label class="form-check-label" for="symptom3"
+                  />
+                  <label class="form-check-label" for="symptom3"
                     >Yellowing</label
                   >
                 </div>
@@ -232,18 +236,20 @@
               <li>
                 <div class="form-check">
                   <input
-                    class="form-check-input"
+                    class="form-check-input symptom-checkbox"
                     type="checkbox"
                     value="stunted_growth"
                     id="symptom4"
-                  /><label class="form-check-label" for="symptom4"
+                  />
+                  <label class="form-check-label" for="symptom4"
                     >Stunted Growth</label
                   >
                 </div>
               </li>
-              <!-- Add other symptoms as needed -->
             </ul>
           </div>
+
+          
           <div id="previewConntainer">
             <img
               id="livePreview"
@@ -292,6 +298,8 @@
       const uploadImage = document.getElementById("sampleImage");
       const imagePreview = document.getElementById("livePreview");
 
+      // Added Live preview for images
+
       function livePreview() {
         const file = uploadImage.files[0];
         if (file) {
@@ -306,6 +314,43 @@
         }
       }
       uploadImage.addEventListener("change", livePreview);
+
+      // Added Multi select with preview in Symptoms
+      document.addEventListener("DOMContentLoaded", function () {
+        const symptomCheckboxes =
+          document.querySelectorAll(".symptom-checkbox");
+        const selectedSymptomsContainer =
+          document.getElementById("selectedSymptoms");
+
+        // Function to update the live preview of selected symptoms
+        function updateSelectedSymptoms() {
+          const selectedSymptoms = [];
+          symptomCheckboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+              selectedSymptoms.push(checkbox.nextElementSibling.textContent);
+            }
+          });
+
+          // Clear existing badges
+          selectedSymptomsContainer.innerHTML = "";
+
+          // Display selected symptoms as badges
+          if (selectedSymptoms.length > 0) {
+            selectedSymptoms.forEach((symptom) => {
+              const badge = document.createElement("span");
+              badge.className = "badge bg-primary me-2";
+              badge.textContent = symptom;
+              selectedSymptomsContainer.appendChild(badge);
+            });
+          }
+        }
+
+        // Add event listeners to each checkbox
+        symptomCheckboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", updateSelectedSymptoms);
+        });
+      });
+
       // Handle form submission
       document
         .getElementById("analysisForm")
