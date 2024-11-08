@@ -15,7 +15,6 @@ This project is a comprehensive plant disease diagnosis system designed to ident
 
 /Plant-Disease-Diagnosis ├── app.py # Main Flask application ├── MemoryNetWork.py # Memory Network implementation ├── PlantVillageModel.py # Model handling, training, and prediction ├── requirements.txt # Project dependencies ├── data/ # Dataset folder (optional) └── README.md # Project documentation
 
-
 ## Installation
 
 1. Clone the repository:
@@ -24,40 +23,45 @@ This project is a comprehensive plant disease diagnosis system designed to ident
    git clone https://github.com/venomous-maker/PathogenAISurveillance
    cd PathogenAISurveillance
    ```
+
 2. Install the required packages:
-    ```bash
+   ```bash
    pip install -r requirements.txt
    ```
+
 ## Usage
 
 ### Starting the Flask Application
 
 To start the Flask web application, run the following command:
+
 ```bash
 python app.py
 ```
+
 This will start the Flask server on http://127.0.0.1:5000/ (or the specified port).
 
 ## API Endpoints
 
-- POST /predict 
-    - Description: Predicts plant disease based on symptoms. 
-    - Request Body:
-      ```json
-        {
-          "symptoms": ["symptom1", "symptom2", ...]
-        }
-      ```
-    - Response:
-        ```json
-        {
-          "predictions": [
-            {"disease": "Disease Name", "confidence": 0.85},
-            {"disease": "Disease Name", "confidence": 0.10},
-            ...
-          ]
-        }
-        ```
+- POST /predict
+  - Description: Predicts plant disease based on symptoms.
+  - Request Body:
+    ```json
+      {
+        "symptoms": ["symptom1", "symptom2", ...]
+      }
+    ```
+  - Response:
+    ```json
+    {
+      "predictions": [
+        {"disease": "Disease Name", "confidence": 0.85},
+        {"disease": "Disease Name", "confidence": 0.10},
+        ...
+      ]
+    }
+    ```
+
 ## Training the Model
 
 If you need to retrain the model, you can use the MemoryNetWork class in MemoryNetWork.py. Make sure to call the following methods:
@@ -65,24 +69,27 @@ If you need to retrain the model, you can use the MemoryNetWork class in MemoryN
 1. prepare_data(): Prepares the data for training.
 2. split_data(): Splits the data into training and testing sets.
 3. build_model(): Builds the neural network model.
-4. compile_model(): Compiles the model with the desired loss function and optimizer. 
-5. train_model(): Trains the model on the prepared data.    
+4. compile_model(): Compiles the model with the desired loss function and optimizer.
+5. train_model(): Trains the model on the prepared data.
 
 ## Model Predictions
 
 Use the predict_disease() method from the MemoryNetWork class to make predictions based on an array of symptoms:
+
 ```python
 predictions = network.predict_disease(["symptom1", "symptom2"])
 ```
 
 ## Requirements
-- Python 3.x 
+
+- Python 3.x
 - Flask
 - TensorFlow / Keras
 - Pandas
 - NumPy
 
 ### Example requirements.txt
+
 ```makefile
 Flask==2.0.3
 tensorflow==2.5.0
@@ -107,3 +114,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contact
 
 For any inquiries, please contact morganokumu8@gmail.com.
+
