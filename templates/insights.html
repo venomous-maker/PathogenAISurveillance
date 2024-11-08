@@ -244,6 +244,18 @@
               <!-- Add other symptoms as needed -->
             </ul>
           </div>
+          <div id="previewConntainer">
+            <img
+              id="livePreview"
+              style="
+                display: none;
+                max-width: 100%;
+                margin-top: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              "
+            />
+          </div>
 
           <label for="sampleImage">Upload Sample Image:</label>
           <input
@@ -277,13 +289,30 @@
 
     <script>
       const submitBtn = document.getElementById("submitBtn");
+      const uploadImage = document.getElementById("sampleImage");
+      const imagePreview = document.getElementById("livePreview");
+
+      function livePreview() {
+        const file = uploadImage.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.style.display = "none";
+        }
+      }
+      uploadImage.addEventListener("change", livePreview);
       // Handle form submission
       document
         .getElementById("analysisForm")
         .addEventListener("submit", async function (event) {
           submitBtn.innerHTML = `
 <span class='spinner-border'></span>
-`
+`;
           event.preventDefault();
 
           const formData = new FormData();
@@ -377,8 +406,8 @@
             alert(
               "An error occurred while submitting the analysis. Please try again later.",
             );
-          }finally{
-            submitBtn.innerHTML = "Submit Analysis"
+          } finally {
+            submitBtn.innerHTML = "Submit Analysis";
           }
         });
     </script>
