@@ -148,14 +148,14 @@ class PlantVillageModel:
             self.model.load_weights(model_weights_path)
             self.loaded_from_file = True
             self.compile()
-            # self.evaluate_model()
+            self.evaluate_model()
             print("Model loaded from", model_json_path)
         elif model_path is not None and model_path != "" and os.path.exists(model_path):
             self.model = tf.keras.models.load_model(model_path)
             self.loaded_from_file = True
             print("Model loaded from", model_path)
             self.compile()
-            # self.evaluate_model()
+            self.evaluate_model()
         else:
             self.model = None
             pass
