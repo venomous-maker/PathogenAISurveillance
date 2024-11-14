@@ -478,7 +478,7 @@ class MemoryNetWork:
                     "Probiotics may help restore normal microbial balance"
                 ]
             },
-            "Covid19": {
+            "covid19": {
                 "preventions": [
                     "Regular hand washing and sanitizing",
                     "Wear masks in crowded places",
