@@ -269,8 +269,8 @@ class PlantVillageModel:
 
 # Instantiate the class
 model = PlantVillageModel(dataset_path="./animal/color")
-model.load_evaluation_results()
-model.load_and_plot_history()
+# model.load_evaluation_results()
+# model.load_and_plot_history()
 if not model.hasmodel():
     # Build, train, and evaluate the model
     model.build_model()
