@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 import pickle
+import json
 
 
 class PlantVillageModel:
@@ -42,6 +43,14 @@ class PlantVillageModel:
                 labels.append(subfolder)
         df = pd.DataFrame({'image': images, 'label': labels})
         return df
+
+    def load_evaluation_results(self, pickle_file="animal_evaluation_results.pkl"):
+        with open(pickle_file, "rb") as f:
+            evaluation_results = pickle.load(f)
+
+        print(
+            f"Loaded Evaluation Results:\nTest Loss: {evaluation_results['Test Loss']}\nTest Accuracy: {evaluation_results['Test Accuracy']}")
+        return evaluation_results
 
     def prepare_data(self):
         df = self.load_data()
@@ -95,7 +104,7 @@ class PlantVillageModel:
         self.compile()
 
     def train_model(self, epochs=20):
-        checkpoint_cb = ModelCheckpoint("plant_disease_model.keras", save_best_only=True)
+        checkpoint_cb = ModelCheckpoint("animal_disease_model.keras", save_best_only=True)
         early_stopping_cb = EarlyStopping(patience=5, restore_best_weights=True)
         history = self.model.fit(
             self.train_generator,
@@ -103,16 +112,31 @@ class PlantVillageModel:
             validation_data=self.val_generator,
             callbacks=[checkpoint_cb, early_stopping_cb]
         )
+
+        # Save history with pickle
+        with open("animal_training_history.pkl", "wb") as f:
+            pickle.dump(history.history, f)
+
         return history
 
-    def evaluate_model(self):
+    def evaluate_model(self, save_path="animal_evaluation_results.pkl"):
         results = self.model.evaluate(self.test_generator)
-        print(f"Test Loss: {results[0]}, Test Accuracy: {results[1]}")
+        test_loss, test_accuracy = results[0], results[1]
+        print(f"Test Loss: {test_loss}, Test Accuracy: {test_accuracy}")
 
-    def save_model(self, filepath="plant_disease_model.h5"):
+        # Save the evaluation results using pickle
+        evaluation_results = {
+            "Test Loss": test_loss,
+            "Test Accuracy": test_accuracy
+        }
+
+        with open(save_path, "wb") as f:
+            pickle.dump(evaluation_results, f)
+
+    def save_model(self, filepath="animal_disease_model.h5"):
         self.model.save(filepath)
 
-    def load_model(self, model_json_path="", model_weights_path="", model_path="saved_model.h5"):
+    def load_model(self, model_json_path="", model_weights_path="", model_path="animal_saved_model.h5"):
         """Loads a pre-trained model from a JSON file."""
         # model_json_path = 'plantvillage_model.json'
         # model_weights_path = 'plantvillage_model_weights.h5'
@@ -124,19 +148,23 @@ class PlantVillageModel:
             self.model.load_weights(model_weights_path)
             self.loaded_from_file = True
             self.compile()
+            self.evaluate_model()
             print("Model loaded from", model_json_path)
         elif model_path is not None and model_path != "" and os.path.exists(model_path):
             self.model = tf.keras.models.load_model(model_path)
             self.loaded_from_file = True
             print("Model loaded from", model_path)
             self.compile()
+            self.evaluate_model()
         else:
             self.model = None
             pass
+
     def compile(self):
         if self.model is None:
             raise ValueError("Model must be compiled before training")
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
     def hasmodel(self):
         return self.model is not None
 
@@ -206,13 +234,43 @@ class PlantVillageModel:
             return closest_matches[0]  # Return the closest match
         return None  # Return None if no close matches found
 
-    def save_as_pickle(self, file = "model.pkl"):
-        with open(file, "wb") as f:
-            pickle.dump(self, f)
+    def load_and_plot_history(self, pickle_file="animal_training_history.pkl", save_path="loaded_training_history_plot.png"):
+        """Loads history from a pickle file, plots, and saves accuracy and loss."""
+        with open(pickle_file, "rb") as f:
+            history_dict = pickle.load(f)
+
+        # Plot accuracy and loss
+        epochs = range(1, len(history_dict['accuracy']) + 1)
+
+        plt.figure(figsize=(14, 5))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs, history_dict['accuracy'], 'bo-', label='Training accuracy')
+        plt.plot(epochs, history_dict['val_accuracy'], 'r-', label='Validation accuracy')
+        plt.title('Training and validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs, history_dict['loss'], 'bo-', label='Training loss')
+        plt.plot(epochs, history_dict['val_loss'], 'r-', label='Validation loss')
+        plt.title('Training and validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+
+        plt.tight_layout()
+
+        # Save the plot
+        plt.savefig(save_path)
+        plt.show()
+
 
 # Instantiate the class
-model = PlantVillageModel(dataset_path="./plantvillage dataset/color")
-
+model = PlantVillageModel(dataset_path="./animal/color")
+model.load_evaluation_results()
+model.load_and_plot_history()
 if not model.hasmodel():
     # Build, train, and evaluate the model
     model.build_model()
@@ -220,7 +278,7 @@ if not model.hasmodel():
     model.evaluate_model()
 
     # Save the model
-    model.save_model("saved_model.h5")
+    model.save_model("animal_saved_model.h5")
 # if model.hasmodel():
 #     # Predict a single image
 #     img_path = "/home/v3n0m/Datasets/Hackathon/plantvillage dataset/color/Grape___Black_rot/0a06c482-c94a-44d8-a895-be6fe17b8c06___FAM_B.Rot 5019.JPG"

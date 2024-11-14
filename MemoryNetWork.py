@@ -1,8 +1,10 @@
 import os
+import pickle
 
 import numpy as np
 import pandas as pd
 import tensorflow
+from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.layers import LSTM, Dense, Embedding, GlobalAveragePooling1D
@@ -25,6 +27,199 @@ class MemoryNetWork:
         self.y_encoded = None
         self.label_encoder = None
         self.signsAndSymptomsDict = {
+            "Amoeba": {
+                "name": "Amoeba",
+                "signs": [
+                    "Presence in contaminated water",
+                    "Small, gelatinous-like body"
+                ],
+                "symptoms": [
+                    "Diarrhea",
+                    "Abdominal pain",
+                    "Amoebic dysentery in severe cases"
+                ]
+            },
+            "Aspergillus niger": {
+                "name": "Aspergillus niger",
+                "signs": [
+                    "Black mold appearance on food or surfaces",
+                    "Presence in damp environments"
+                ],
+                "symptoms": [
+                    "Respiratory issues",
+                    "Fungal infections in immunocompromised individuals",
+                    "Allergic reactions"
+                ]
+            },
+            "Candida albicans": {
+                "name": "Candida albicans",
+                "signs": [
+                    "White, creamy colonies in culture",
+                    "Thrush in the mouth"
+                ],
+                "symptoms": [
+                    "Oral thrush",
+                    "Vaginal yeast infections",
+                    "Skin infections",
+                    "Digestive issues in severe cases"
+                ]
+            },
+            "covid19": {
+                "name": "COVID-19",
+                "signs": [
+                    "Fever",
+                    "Cough",
+                    "Positive PCR test"
+                ],
+                "symptoms": [
+                    "Loss of taste and smell",
+                    "Shortness of breath",
+                    "Fatigue",
+                    "Body aches"
+                ]
+            },
+            "Epidermophyton floccosum": {
+                "name": "Epidermophyton floccosum",
+                "signs": [
+                    "Greenish-gray colonies in lab culture",
+                    "Skin scaling"
+                ],
+                "symptoms": [
+                    "Athlete's foot",
+                    "Jock itch",
+                    "Ringworm"
+                ]
+            },
+            "Euglena": {
+                "name": "Euglena",
+                "signs": [
+                    "Green, photosynthetic body",
+                    "Eye spot present in cells"
+                ],
+                "symptoms": [
+                    "Potential algae blooms affecting water quality"
+                ]
+            },
+            "Hydra": {
+                "name": "Hydra",
+                "signs": [
+                    "Small, tube-like body in freshwater",
+                    "Tentacles around the mouth"
+                ],
+                "symptoms": [
+                    "No direct symptoms in humans",
+                    "Part of freshwater ecosystem balance"
+                ]
+            },
+            "Malaria": {
+                "name": "Malaria",
+                "signs": [
+                    "Detection of Plasmodium in blood smear",
+                    "Presence of mosquito vectors in the area"
+                ],
+                "symptoms": [
+                    "High fever",
+                    "Chills and sweats",
+                    "Headache and muscle pain",
+                    "Fatigue"
+                ]
+            },
+            "Paramecium": {
+                "name": "Paramecium",
+                "signs": [
+                    "Ciliated body visible under a microscope",
+                    "Fast movement in water"
+                ],
+                "symptoms": [
+                    "No direct symptoms in humans",
+                    "Important part of freshwater ecosystems"
+                ]
+            },
+            "Rod Bacteria": {
+                "name": "Rod Bacteria",
+                "signs": [
+                    "Rod-shaped cells visible under a microscope",
+                    "Commonly found in soil, water, and on surfaces"
+                ],
+                "symptoms": [
+                    "May cause various bacterial infections depending on type",
+                    "Possible respiratory or digestive issues"
+                ]
+            },
+            "Spherical Bacteria": {
+                "name": "Spherical Bacteria",
+                "signs": [
+                    "Spherical or round cell shape under a microscope",
+                    "Commonly found on skin and surfaces"
+                ],
+                "symptoms": [
+                    "Various infections depending on species",
+                    "Can cause skin, respiratory, or gastrointestinal issues"
+                ]
+            },
+            "Spiral Bacteria": {
+                "name": "Spiral Bacteria",
+                "signs": [
+                    "Spiral or corkscrew-shaped cells visible under a microscope",
+                    "Commonly found in contaminated water or soil"
+                ],
+                "symptoms": [
+                    "Potential digestive issues if ingested",
+                    "Possible infections like Lyme disease"
+                ]
+            },
+            "Trichophyton mentagrophytes": {
+                "name": "Trichophyton mentagrophytes",
+                "signs": [
+                    "White, powdery colonies in culture",
+                    "Infects hair, skin, and nails"
+                ],
+                "symptoms": [
+                    "Itchy, scaly skin",
+                    "Ringworm",
+                    "Athlete's foot"
+                ]
+            },
+            "Trichophyton rubrum": {
+                "name": "Trichophyton rubrum",
+                "signs": [
+                    "Red-pigmented colonies in culture",
+                    "Prefers skin and nail infections"
+                ],
+                "symptoms": [
+                    "Chronic skin infections",
+                    "Fungal nail infections",
+                    "Scaling and redness"
+                ]
+            },
+            "tuberculosis": {
+                "name": "Tuberculosis",
+                "signs": [
+                    "Positive tuberculin skin test",
+                    "Presence of tubercles on X-rays"
+                ],
+                "symptoms": [
+                    "Persistent cough",
+                    "Weight loss",
+                    "Night sweats",
+                    "Fever"
+                ]
+            },
+            "Yeast": {
+                "name": "Yeast",
+                "signs": [
+                    "Budding cells under a microscope",
+                    "Commonly found on skin and mucous membranes"
+                ],
+                "symptoms": [
+                    "Thrush",
+                    "Yeast infections",
+                    "Digestive imbalances if overgrown"
+                ]
+            }
+        }
+
+        self.signsAndSymptomsDict_ = {
             "Apple Scab": {
                 "name": "Apple Scab",
                 "signs": [
@@ -246,8 +441,198 @@ class MemoryNetWork:
                 "symptoms": ["Healthy foliage", "No visible spots or lesions"],
             },
         }
-
         self.preventionsAndCure = {
+            "Amoeba": {
+                "preventions": [
+                    "Avoid drinking untreated water",
+                    "Practice good hygiene, especially in areas with poor sanitation",
+                    "Avoid swimming in contaminated water bodies"
+                ],
+                "cure": [
+                    "Use prescribed anti-amoebic medications",
+                    "Maintain hydration if symptoms like diarrhea occur",
+                    "Seek medical advice for proper treatment"
+                ]
+            },
+            "Aspergillus niger": {
+                "preventions": [
+                    "Keep indoor environments dry and well-ventilated",
+                    "Remove mold from surfaces promptly",
+                    "Avoid foods that show signs of mold"
+                ],
+                "cure": [
+                    "Antifungal treatments as prescribed",
+                    "Use of air purifiers in mold-prone areas",
+                    "Proper cleaning and disinfection of surfaces"
+                ]
+            },
+            "Candida albicans": {
+                "preventions": [
+                    "Practice good personal hygiene",
+                    "Avoid excessive use of antibiotics",
+                    "Maintain a balanced diet to support immune health"
+                ],
+                "cure": [
+                    "Use antifungal medications",
+                    "Maintain good oral and skin hygiene",
+                    "Probiotics may help restore normal microbial balance"
+                ]
+            },
+            "COVID-19": {
+                "preventions": [
+                    "Regular hand washing and sanitizing",
+                    "Wear masks in crowded places",
+                    "Stay updated with vaccinations"
+                ],
+                "cure": [
+                    "Rest and hydration",
+                    "Antiviral medications for severe cases as prescribed",
+                    "Isolate to prevent spreading to others"
+                ]
+            },
+            "Epidermophyton floccosum": {
+                "preventions": [
+                    "Avoid sharing personal items like towels",
+                    "Keep skin dry and clean",
+                    "Wear footwear in public showers or pools"
+                ],
+                "cure": [
+                    "Topical or oral antifungal treatments",
+                    "Maintain dryness in affected areas",
+                    "Regular cleaning of infected areas"
+                ]
+            },
+            "Euglena": {
+                "preventions": [
+                    "Avoid stagnant water that can harbor algae blooms",
+                    "Proper water filtration for drinking water",
+                    "Monitor and maintain water quality in aquariums"
+                ],
+                "cure": [
+                    "Typically no cure needed; harmless to humans",
+                    "Use chemical treatment in water if bloom is excessive",
+                    "Ensure ecosystem balance in aquariums"
+                ]
+            },
+            "Hydra": {
+                "preventions": [
+                    "Maintain water quality in aquariums or freshwater sources",
+                    "Control water plants and algae to prevent overpopulation"
+                ],
+                "cure": [
+                    "No treatment needed as it is generally non-harmful to humans",
+                    "Maintain ecological balance in water systems"
+                ]
+            },
+            "Malaria": {
+                "preventions": [
+                    "Use mosquito nets and repellents",
+                    "Avoid mosquito bites, especially in endemic areas",
+                    "Take antimalarial medications if traveling to high-risk areas"
+                ],
+                "cure": [
+                    "Use antimalarial drugs as prescribed",
+                    "Seek medical treatment promptly",
+                    "Hydration and rest to manage symptoms"
+                ]
+            },
+            "Paramecium": {
+                "preventions": [
+                    "Avoid drinking untreated water",
+                    "Maintain cleanliness in water systems"
+                ],
+                "cure": [
+                    "Generally harmless to humans",
+                    "Maintain clean and filtered water in aquariums"
+                ]
+            },
+            "Rod Bacteria": {
+                "preventions": [
+                    "Wash hands regularly",
+                    "Avoid contact with contaminated surfaces",
+                    "Disinfect surfaces that may harbor bacteria"
+                ],
+                "cure": [
+                    "Antibiotic treatment for specific infections",
+                    "Follow medical guidance for bacterial infections",
+                    "Maintain personal and environmental hygiene"
+                ]
+            },
+            "Spherical Bacteria": {
+                "preventions": [
+                    "Good personal hygiene practices",
+                    "Regularly disinfect commonly touched surfaces",
+                    "Proper food handling and preparation"
+                ],
+                "cure": [
+                    "Antibiotic treatment as prescribed",
+                    "Hydration and rest to support recovery",
+                    "Medical consultation for appropriate treatment"
+                ]
+            },
+            "Spiral Bacteria": {
+                "preventions": [
+                    "Avoid drinking untreated water",
+                    "Cook meat thoroughly to avoid infection",
+                    "Practice proper sanitation"
+                ],
+                "cure": [
+                    "Antibiotics as prescribed by a healthcare provider",
+                    "Supportive care for digestive symptoms",
+                    "Maintain hydration if symptoms occur"
+                ]
+            },
+            "Trichophyton mentagrophytes": {
+                "preventions": [
+                    "Avoid walking barefoot in public places",
+                    "Keep skin and nails dry and clean",
+                    "Do not share personal items like towels"
+                ],
+                "cure": [
+                    "Topical antifungal treatments",
+                    "Oral antifungal medications for severe cases",
+                    "Regularly wash and dry affected areas"
+                ]
+            },
+            "Trichophyton rubrum": {
+                "preventions": [
+                    "Maintain good foot hygiene",
+                    "Wear breathable footwear",
+                    "Avoid sharing personal items"
+                ],
+                "cure": [
+                    "Apply antifungal creams or ointments",
+                    "Use oral antifungals for severe infections",
+                    "Keep affected skin areas clean and dry"
+                ]
+            },
+            "Tuberculosis": {
+                "preventions": [
+                    "Vaccination with BCG (where applicable)",
+                    "Avoid close contact with TB-infected individuals",
+                    "Good ventilation in living spaces"
+                ],
+                "cure": [
+                    "Long-term antibiotic regimen as prescribed",
+                    "Isolation during infectious stages",
+                    "Monitor and follow up with healthcare provider"
+                ]
+            },
+            "Yeast": {
+                "preventions": [
+                    "Maintain balanced diet to support immune health",
+                    "Practice good personal hygiene",
+                    "Avoid excessive use of antibiotics"
+                ],
+                "cure": [
+                    "Antifungal medications for infections",
+                    "Maintain good hygiene in affected areas",
+                    "Probiotics may help restore normal microbial balance"
+                ]
+            }
+        }
+
+        self.preventionsAndCure_ = {
             "Apple Scab": {
                 "preventions": [
                     "Use disease-resistant apple varieties",
@@ -756,14 +1141,17 @@ class MemoryNetWork:
             self.model = tensorflow.keras.models.model_from_json(model_json)
             self.model.load_weights(model_weights_path)
             self.compile_model()
+            # if self.model is not None:
+            #     self.evaluate_model()
             print("Model loaded from", model_json_path)
         elif model_path is not None and model_path != "" and os.path.exists(model_path):
             self.model = tensorflow.keras.models.load_model(model_path)
             print("Model loaded from", model_path)
             self.compile_model()
+            # if self.model is not None:
+            #     self.evaluate_model()
         else:
             self.model = None
-            pass
 
     def model_summary(self):
         # Print model summary
@@ -771,7 +1159,7 @@ class MemoryNetWork:
 
     def train_model(self):
         # Train the model
-        self.model.fit(
+        history = self.model.fit(
             self.X_train,
             self.y_train,
             epochs=100,
@@ -779,10 +1167,57 @@ class MemoryNetWork:
             validation_data=(self.X_test, self.y_test),
         )
 
-    def evaluate_model(self):
+        # Save history with pickle
+        with open("nlp_training_history.pkl", "wb") as f:
+            pickle.dump(history.history, f)
+
+        return history
+
+    def evaluate_model(self, save_path="nlp_evaluation_results.pkl"):
         # Evaluate the model
         self.loss, self.accuracy = self.model.evaluate(self.X_test, self.y_test)
         print(f"Test Accuracy: {self.accuracy:.2f}")
+
+        # Save the evaluation results using pickle
+        evaluation_results = {
+            "Test Loss": self.loss,
+            "Test Accuracy": self.accuracy
+        }
+
+        with open(save_path, "wb") as f:
+            pickle.dump(evaluation_results, f)
+
+    def load_and_plot_history(self, pickle_file="nlp_training_history.pkl", save_path="nlp_loaded_training_history_plot.png"):
+        """Loads history from a pickle file, plots, and saves accuracy and loss."""
+        with open(pickle_file, "rb") as f:
+            history_dict = pickle.load(f)
+
+        # Plot accuracy and loss
+        epochs = range(1, len(history_dict['accuracy']) + 1)
+
+        plt.figure(figsize=(14, 5))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs, history_dict['accuracy'], 'bo-', label='Training accuracy')
+        plt.plot(epochs, history_dict['val_accuracy'], 'r-', label='Validation accuracy')
+        plt.title('Training and validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs, history_dict['loss'], 'bo-', label='Training loss')
+        plt.plot(epochs, history_dict['val_loss'], 'r-', label='Validation loss')
+        plt.title('Training and validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+
+        plt.tight_layout()
+
+        # Save the plot
+        plt.savefig(save_path)
+        plt.show()
 
     def predict_disease(self, signs_and_symptoms):
         # Ensure signs_and_symptoms is a string
