@@ -462,7 +462,7 @@
           <div class="card-box align-left">
             
             <p class="card-title mbr-fonts-style mb-3 display-1">
-              <strong>1,000+</strong>
+              <strong>{{num_classes}}+</strong>
             </p>
             <p class="card-text mbr-fonts-style mb-3 display-7">Pathogens Identified</p>
             
@@ -474,7 +474,7 @@
           <div class="card-box align-left">
             
             <p class="card-title mbr-fonts-style mb-3 display-1">
-              <strong>99%</strong>
+              <strong>{{round(accuracy*100, 2)}}%</strong>
             </p>
             <p class="card-text mbr-fonts-style mb-3 display-7">Accuracy Rate</p>
             
@@ -486,7 +486,7 @@
           <div class="card-box align-left">
             
             <p class="card-title mbr-fonts-style mb-3 display-1">
-              <strong>500+</strong>
+              <strong>{{total_images}}+</strong>
             </p>
             <p class="card-text mbr-fonts-style mb-3 display-7">Images Analyzed</p>
             

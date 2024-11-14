@@ -44,6 +44,17 @@ class PlantVillageModel:
         df = pd.DataFrame({'image': images, 'label': labels})
         return df
 
+    def get_dataset_summary(self):
+        """Return total images and number of unique classes in the dataset."""
+        total_images = len(self.train_generator.filenames) + len(self.val_generator.filenames) + len(
+            self.test_generator.filenames)
+        num_classes = len(self.class_labels)
+
+        return {
+            "total_images": total_images,
+            "num_classes": num_classes
+        }
+
     def load_evaluation_results(self, pickle_file="animal_evaluation_results.pkl"):
         with open(pickle_file, "rb") as f:
             evaluation_results = pickle.load(f)

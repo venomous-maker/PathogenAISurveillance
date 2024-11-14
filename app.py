@@ -23,7 +23,9 @@ memory_network_handler = network
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', accuracy=model_handler.load_evaluation_results()['Test Accuracy'], round = round,
+                           loss= model_handler.load_evaluation_results()['Test Loss'], images_analyzed = model.get_dataset_summary()['total_images'],
+                           num_classes = model.get_dataset_summary()['num_classes'],)
 
 
 @app.route('/insights')
