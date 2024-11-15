@@ -1258,7 +1258,17 @@ class MemoryNetWork:
 
     def hasmodel(self):
         return self.model is not None
-
+    
+    def get_merged_signs_and_symptoms(self):
+        merged_list = []
+        
+        # Iterate over each pathogen in the dictionary
+        for pathogen in self.signsAndSymptomsDict.values():
+            # Merge signs and symptoms into one list
+            merged_list.extend(pathogen.get('signs', []))
+            merged_list.extend(pathogen.get('symptoms', []))
+        
+        return merged_list
 
 # Instantiate the MemoryNetWork
 network = MemoryNetWork()

@@ -171,72 +171,36 @@
             <option value="parasite">Parasite</option>
           </select>
           <!-- Selected Symptoms Preview -->
-          <div id="selectedSymptoms" class="mt-3"></div>
-          <label for="symptoms">Symptoms:</label>
-          <div class="input-group" id="symptoms">
-            <button
-              class="btn btn-outline-secondary dropdown-toggle w-100"
-              type="button"
-              id="dropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              data-bs-auto-close="outside"
-            >
-              Select Symptoms
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li>
-                <div class="form-check">
-                  <input
-                    class="form-check-input symptom-checkbox"
-                    type="checkbox"
-                    value="leaf_spot"
-                    id="symptom1"
-                  />
-                  <label class="form-check-label" for="symptom1"
-                    >Leaf Spot</label
-                  >
-                </div>
-              </li>
-              <li>
-                <div class="form-check">
-                  <input
-                    class="form-check-input symptom-checkbox"
-                    type="checkbox"
-                    value="wilting"
-                    id="symptom2"
-                  />
-                  <label class="form-check-label" for="symptom2">Wilting</label>
-                </div>
-              </li>
-              <li>
-                <div class="form-check">
-                  <input
-                    class="form-check-input symptom-checkbox"
-                    type="checkbox"
-                    value="yellowing"
-                    id="symptom3"
-                  />
-                  <label class="form-check-label" for="symptom3"
-                    >Yellowing</label
-                  >
-                </div>
-              </li>
-              <li>
-                <div class="form-check">
-                  <input
-                    class="form-check-input symptom-checkbox"
-                    type="checkbox"
-                    value="stunted_growth"
-                    id="symptom4"
-                  />
-                  <label class="form-check-label" for="symptom4"
-                    >Stunted Growth</label
-                  >
-                </div>
-              </li>
-            </ul>
-          </div>
+          <!-- Selected Symptoms Preview -->
+<div id="selectedSymptoms" class="mt-3"></div>
+
+<label for="symptoms">Symptoms:</label>
+<div class="input-group" id="symptoms">
+  <button
+    class="btn btn-outline-secondary dropdown-toggle w-100"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    data-bs-auto-close="outside"
+  >
+    Select Symptoms
+  </button>
+  
+  <!-- Dropdown with Search Filter -->
+  <ul class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton" id="symptomsList">
+    <!-- Search input for filtering symptoms -->
+    <li>
+      <input 
+        type="text" 
+        class="form-control mb-2" 
+        id="symptomSearchInput" 
+        placeholder="Search symptoms..."
+      />
+    </li>
+  </ul>
+</div>
+
 
           <div id="previewConntainer">
             <img
@@ -304,40 +268,40 @@
       uploadImage.addEventListener("change", livePreview);
 
       // Added Multi select with preview in Symptoms
-      document.addEventListener("DOMContentLoaded", function () {
-        const symptomCheckboxes =
-          document.querySelectorAll(".symptom-checkbox");
-        const selectedSymptomsContainer =
-          document.getElementById("selectedSymptoms");
+      //  document.addEventListener("DOMContentLoaded", function () {
+      //   const symptomCheckboxes =
+      //     document.querySelectorAll(".symptom-checkbox");
+      //   const selectedSymptomsContainer =
+      //     document.getElementById("selectedSymptoms");
 
-        // Function to update the live preview of selected symptoms
-        function updateSelectedSymptoms() {
-          const selectedSymptoms = [];
-          symptomCheckboxes.forEach((checkbox) => {
-            if (checkbox.checked) {
-              selectedSymptoms.push(checkbox.nextElementSibling.textContent);
-            }
-          });
+      //   // Function to update the live preview of selected symptoms
+      //   function updateSelectedSymptoms() {
+      //     const selectedSymptoms = [];
+      //     symptomCheckboxes.forEach((checkbox) => {
+      //       if (checkbox.checked) {
+      //         selectedSymptoms.push(checkbox.nextElementSibling.textContent);
+      //       }
+      //     });
 
-          // Clear existing badges
-          selectedSymptomsContainer.innerHTML = "";
+      //     // Clear existing badges
+      //     selectedSymptomsContainer.innerHTML = "";
 
-          // Display selected symptoms as badges
-          if (selectedSymptoms.length > 0) {
-            selectedSymptoms.forEach((symptom) => {
-              const badge = document.createElement("span");
-              badge.className = "badge bg-primary me-2";
-              badge.textContent = symptom;
-              selectedSymptomsContainer.appendChild(badge);
-            });
-          }
-        }
+      //     // Display selected symptoms as badges
+      //     if (selectedSymptoms.length > 0) {
+      //       selectedSymptoms.forEach((symptom) => {
+      //         const badge = document.createElement("span");
+      //         badge.className = "badge bg-primary me-2";
+      //         badge.textContent = symptom;
+      //         selectedSymptomsContainer.appendChild(badge);
+      //       });
+      //     }
+      //   }
 
-        // Add event listeners to each checkbox
-        symptomCheckboxes.forEach((checkbox) => {
-          checkbox.addEventListener("change", updateSelectedSymptoms);
-        });
-      });
+      //   // Add event listeners to each checkbox
+      //   symptomCheckboxes.forEach((checkbox) => {
+      //     checkbox.addEventListener("change", updateSelectedSymptoms);
+      //   });
+      // });
       // Handle form submission
       document
         .getElementById("analysisForm")
@@ -456,6 +420,106 @@
             submitBtn.innerHTML = "Submit Analysis";
           }
         });
+        const symptomsList = document.getElementById("symptomsList")
+
+        const fetchSymptoms = async () => {
+  try {
+    const response = await fetch('/signs-symptomps');
+    const res = await response.json();
+    console.log(res);
+
+    // Reference to the symptoms list container
+    const symptomsList = document.getElementById("symptomsList");
+    const selectedSymptomsContainer = document.getElementById("selectedSymptoms");
+
+    // Create search input field
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'form-control mb-2';
+    searchInput.placeholder = 'Search symptoms...';
+
+    // Function to update the live preview of selected symptoms
+    const updateSelectedSymptoms = () => {
+      const selectedSymptoms = [];
+      const symptomCheckboxes = document.querySelectorAll(".symptom-checkbox");
+      symptomCheckboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          selectedSymptoms.push(checkbox.nextElementSibling.textContent);
+        }
+      });
+
+      // Clear existing badges
+      selectedSymptomsContainer.innerHTML = "";
+
+      // Display selected symptoms as badges
+      if (selectedSymptoms.length > 0) {
+        selectedSymptoms.forEach((symptom) => {
+          const badge = document.createElement("span");
+          badge.className = "badge bg-primary me-2";
+          badge.textContent = symptom;
+          selectedSymptomsContainer.appendChild(badge);
+        });
+      }
+    };
+
+    // Function to add event listeners to each checkbox
+    const addCheckboxListeners = () => {
+      const symptomCheckboxes = document.querySelectorAll(".symptom-checkbox");
+      symptomCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", updateSelectedSymptoms);
+      });
+    };
+
+    // Function to render symptoms as checkboxes
+    const renderSymptoms = (symptoms) => {
+      // Clear previous list
+      symptomsList.innerHTML = "";
+      symptomsList.appendChild(searchInput); // Ensure search input is rendered
+
+      symptoms.forEach((t) => {
+        let li = document.createElement('li');
+        li.innerHTML = `
+          <div class="form-check">
+            <input
+              class="form-check-input symptom-checkbox"
+              type="checkbox"
+              value="${t}"
+              id="${t}"
+            />
+            <label class="form-check-label" for="${t}">${t}</label>
+          </div>
+        `;
+        symptomsList.appendChild(li);
+      });
+
+      // Reattach event listeners to the new checkboxes
+      addCheckboxListeners();
+    };
+
+    // Function to filter symptoms based on search input
+    const filterSymptoms = () => {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filteredSymptoms = res.filter((symptom) =>
+        symptom.toLowerCase().includes(searchTerm)
+      );
+      renderSymptoms(filteredSymptoms);
+    };
+
+    // Attach the filter function to the search input
+    searchInput.addEventListener('input', filterSymptoms);
+
+    // Initial render of all symptoms
+    renderSymptoms(res);
+
+  } catch (error) {
+    console.error('Error fetching symptoms:', error);
+  }
+};
+
+// Fetch and render symptoms on page load
+document.addEventListener("DOMContentLoaded", fetchSymptoms);
+
+
     </script>
     <!-- Scripts in correct order -->
     <script
